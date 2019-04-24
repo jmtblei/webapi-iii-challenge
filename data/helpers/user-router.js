@@ -2,6 +2,17 @@ const express = require('express');
 const router = express.Router();
 const userDb = require('./userDb');
 
+function uppercaseName(req, res, next) {
+    const name = req.body.name;
+    if( name[0] !== name[0].toUpperCase()) {
+        return res.status(400).json({
+            errorMessage: 'First letter of name must be uppercase.'
+        })
+    } else {
+        next();
+    }
+};
+
 router.get('/', (req, res) => {
     userDb.get()
     .then(response => {
@@ -12,7 +23,7 @@ router.get('/', (req, res) => {
     })
 })
 
-router.post('/', (req, res) => {
+router.post('/', uppercaseName, (req, res) => {
     const user = req.body;
     if (user.name) {
         userDb.insert(user)
@@ -57,14 +68,14 @@ router.delete('/:id', (req, res) => {
     })
 })
 
-router.put('/:id', (req, res) => {
+router.put('/:id', uppercaseName, (req, res) => {
     const userId = req.params.id;
     const changes = req.body;
     if (changes.name) {
         userDb.update(userId, changes)
         .then(response => {
             if (response) {
-                res.status(200).json(response);
+                res.status(200).json({ response, message: "The user's name has been updated!" });
             } else {
                 res.status(404).json({ message: "The user with the specified ID does not exist." })
             }

@@ -31,10 +31,11 @@ router.get("/:id", (req, res) => {
     const postId = req.params.id;
     postDb.getById(postId)
     .then(response => {
-        if (response.length === 0) {
-            res.status(404).json({ error: err, message: "The post with the specified ID does not exist." })
-        } else {
+        if (response) {
             res.status(200).json(response);
+        } else {
+            console.log("thisone", response)
+            res.status(404).json({ message: "The post with the specified ID does not exist." })
         }
     })
     .catch(err => {
@@ -64,7 +65,7 @@ router.put("/:id", (req, res) => {
         postDb.update(postId, properties)
         .then(response => {
             if (response) {
-                res.status(200).json(response);
+                res.status(200).json({ response, message: "The post has been updated!" });
             } else {
                 res.status(404).json({ errorMessage: "The post with the specified ID does not exist." })
             }
